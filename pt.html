@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Findings — Tests de validation</title>
+<meta name="description" content="Comment valider chaque finding High et Medium relevé sur l'app mobile banking : commandes, outils, PoC.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14161c;
+    --bg-raised: #1b1e26;
+    --bg-inset: #101218;
+    --line: #2b2f3a;
+    --text: #e7e4db;
+    --text-dim: #9aa0ad;
+    --amber: #f2a154;
+    --amber-dim: #c98548;
+    --teal: #5cc2ae;
+    --red: #e2645a;
+    --red-dim: #8a3d38;
+    --radius: 3px;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0; background: var(--bg); color: var(--text);
+    font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  a{ color: var(--amber); }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--teal); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+  .wrap{ max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero{
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(226,101,90,0.07), transparent 60%), var(--bg);
+    padding: 64px 0 40px;
+  }
+  .kicker{
+    font-family: var(--mono); font-size: 13px; color: var(--teal);
+    margin: 0 0 18px; display:flex; align-items:center; gap: 10px;
+  }
+  .kicker .dot{ width:7px; height:7px; border-radius:50%; background: var(--teal); box-shadow: 0 0 0 3px rgba(92,194,174,0.15); }
+  header.hero a.back{ font-family: var(--mono); font-size: 12.5px; color: var(--text-dim); text-decoration: none; }
+  header.hero a.back:hover{ color: var(--amber); }
+  h1{ font-size: clamp(1.9rem, 4.5vw, 2.6rem); line-height: 1.14; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .hero p.lede{ font-size: 1.05rem; color: var(--text-dim); max-width: 62ch; margin: 0 0 26px; }
+
+  .legend{ display:flex; gap: 18px; flex-wrap: wrap; font-family: var(--mono); font-size: 12.5px; color: var(--text-dim); }
+  .legend span{ display:flex; align-items:center; gap: 7px; }
+  .legend .sw{ width:10px; height:10px; border-radius:2px; }
+  .sw.high{ background: var(--red); }
+  .sw.med{ background: var(--amber); }
+
+  section.group{ padding: 52px 0 8px; }
+  section.group h2{
+    font-size: 0.8rem; letter-spacing: 0.06em; font-family: var(--mono);
+    margin: 0 0 4px; display:flex; align-items:center; gap:10px;
+  }
+  section.group h2.high{ color: var(--red); }
+  section.group h2.med{ color: var(--amber); }
+  section.group > .sub{ color: var(--text-dim); font-size: 0.92rem; margin: 0 0 30px; }
+
+  .card{
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-head{
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--line);
+    display:flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+  }
+  .card-head h3{ margin: 0 0 6px; font-size: 1.05rem; font-weight: 600; }
+  .card-head .finding-text{ color: var(--text-dim); font-size: 0.9rem; margin: 0; }
+  .sev-badge{
+    font-family: var(--mono); font-size: 11px; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+  }
+  .sev-badge.high{ color: var(--red); border: 1px solid rgba(226,101,90,0.4); background: rgba(226,101,90,0.08); }
+  .sev-badge.med{ color: var(--amber); border: 1px solid rgba(242,161,84,0.4); background: rgba(242,161,84,0.08); }
+
+  .card-body{ padding: 18px 22px 22px; }
+  .card-body h4{
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.03em;
+    color: var(--teal); margin: 18px 0 8px; font-weight: 600;
+  }
+  .card-body h4:first-child{ margin-top: 0; }
+  pre{
+    background: var(--bg-inset); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; overflow-x: auto; margin: 0 0 10px;
+  }
+  pre code{ font-family: var(--mono); font-size: 12.8px; line-height: 1.6; color: #d8dbe3; white-space: pre; }
+  pre .cm{ color: #6b7180; }
+  .card-body p{ font-size: 13.8px; color: var(--text-dim); margin: 8px 0; }
+  .card-body p strong{ color: var(--text); }
+  .verdict{
+    font-size: 13px; margin: 14px 0 0; padding: 10px 14px;
+    border-left: 2px solid var(--amber-dim); background: rgba(242,161,84,0.05);
+    color: var(--text-dim);
+  }
+  .verdict strong{ color: var(--text); }
+  .env-flag{
+    font-size: 12.5px; margin: 14px 0 0; padding: 8px 14px;
+    border-left: 2px solid var(--red-dim); background: rgba(226,101,90,0.05);
+    color: var(--text-dim); font-family: var(--mono);
+  }
+
+  footer{
+    border-top: 1px solid var(--line); padding: 32px 0 48px;
+    color: var(--text-dim); font-size: 13px; font-family: var(--mono);
+  }
+  footer a{ color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker"><span class="dot"></span><a class="back" href="index.html">← méthodologie</a></p>
+    <h1>Findings — tests de validation</h1>
+    <p class="lede">Pour chaque vulnérabilité relevée par le scan automatisé : comment la confirmer manuellement, avec quel outil, et ce qui distingue un impact réel d'un faux positif.</p>
+    <div class="legend">
+      <span><span class="sw high"></span>High — 6 findings</span>
+      <span><span class="sw med"></span>Medium — 7 findings</span>
+    </div>
+  </div>
+</header>
+
+<section class="group">
+  <div class="wrap">
+    <h2 class="high">SÉVÉRITÉ HIGH</h2>
+    <p class="sub">À traiter en priorité — impact direct sur les données ou les utilisateurs si confirmé.</p>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Certificat signé SHA1withRSA</h3>
+          <p class="finding-text">SHA-1 est un algorithme de hash connu pour ses collisions.</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>VÉRIFIER</h4>
+<pre><code>apksigner verify --verbose app.apk
+keytool -printcert -jarfile app.apk
+
+<span class="cm"># Vérifier la présence de schémas v2/v3 en complément</span>
+apksigner verify --print-certs app.apk</code></pre>
+        <p>Regarder la ligne <strong>Signature algorithm name</strong>. Si elle affiche <code>SHA1withRSA</code>, le finding est confirmé statiquement.</p>
+        <div class="verdict"><strong>Impact réel :</strong> teste l'installation sur un device Android 10+ pour voir si un warning ou un refus apparaît. Si l'app a aussi un schéma v2/v3 (SHA-256), le risque réel est plus faible malgré le finding.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Padding Oracle — CBC + PKCS5/PKCS7</h3>
+          <p class="finding-text">com/nimbusds/jose/crypto/impl/AESCBC.java:32</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>LOCALISER L'USAGE</h4>
+<pre><code>jadx-gui app.apk
+<span class="cm"># Ouvrir AESCBC.java:32 et JCASupport.java:189
+# → chiffrement réseau (JWE/JWT) ou stockage local uniquement ?</span></code></pre>
+        <h4>SI RÉSEAU — TESTER L'ORACLE</h4>
+<pre><code><span class="cm"># Repérer d'abord le comportement serveur sur un ciphertext corrompu (Burp Repeater)
+# puis :</span>
+padbuster https://target.com/endpoint "CIPHERTEXT_URL_ENCODED" 16 \
+  -encoding 0 \
+  -cookies "session=xxx" \
+  -error "Bad padding"</code></pre>
+        <div class="verdict"><strong>Si aucun endpoint réseau</strong> ne fait ce déchiffrement, documente le finding comme théorique/local uniquement — la faiblesse de conception reste valide (CWE-649) mais l'exploitabilité à distance est nulle, à refléter dans la sévérité du rapport.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Cleartext traffic autorisé</h3>
+          <p class="finding-text">Domain config permet du trafic HTTP non chiffré sur certains domaines.</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>IDENTIFIER LES DOMAINES CONCERNÉS</h4>
+<pre><code>apktool d app.apk -o app_decoded
+cat app_decoded/res/xml/network_security_config.xml
+<span class="cm"># Cherche &lt;domain-config cleartextTrafficPermitted="true"&gt;</span></code></pre>
+        <h4>TESTER EN DYNAMIQUE</h4>
+<pre><code><span class="cm"># Proxy Burp actif, naviguer dans toute l'app
+# Burp → Proxy → HTTP History → filtrer les requêtes en http://</span></code></pre>
+        <p>Vérifier si un des domaines listés dans le XML reçoit réellement des données sensibles (login, tokens, PII) en clair.</p>
+        <div class="verdict"><strong>Impact réel :</strong> critique si des données sensibles transitent ; faible si le domaine ne sert qu'à un CDN d'assets statiques non sensibles.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>App Link assetlinks.json manquant</h3>
+          <p class="finding-text">host=https://mbapp.byblosbank.com — vérification App Links non effective</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>CONFIRMER L'ABSENCE DU FICHIER</h4>
+<pre><code>curl -i https://mbapp.byblosbank.com/.well-known/assetlinks.json</code></pre>
+        <h4>PoC DE HIJACK</h4>
+<pre><code><span class="cm"># Créer une seconde app de test avec le même intent-filter (host identique)
+# puis déclencher le lien :</span>
+adb shell am start -a android.intent.action.VIEW -d "https://mbapp.byblosbank.com/reset?token=xxx"</code></pre>
+        <p>Si un <strong>sélecteur d'application</strong> apparaît au lieu d'ouvrir directement l'app légitime, la vérification n'est pas effective.</p>
+<pre><code><span class="cm"># Confirmer aussi côté Manifest</span>
+grep -A 3 "autoVerify" app_decoded/AndroidManifest.xml</code></pre>
+        <div class="verdict"><strong>Impact réel :</strong> une app malveillante peut intercepter ces liens → phishing, vol de tokens OAuth ou de reset password.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>App installable sur Android 7.0 (minSdk=24)</h3>
+          <p class="finding-text">Devices anciens sans patchs de sécurité récents.</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>CONFIRMER</h4>
+<pre><code>aapt dump badging app.apk | grep -i sdkVersion</code></pre>
+        <p>Pas de test d'exploitation ici — c'est une faiblesse de <strong>configuration</strong>, pas une vulnérabilité active.</p>
+        <div class="verdict">Documenter : minSdk actuel, recommandation (minSdk ≥ 29 / Android 10), et impact contextuel — la part réelle du parc utilisateur encore sur Android 7-9.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>ATS AllowsArbitraryLoads (iOS)</h3>
+          <p class="finding-text">App Transport Security désactivé pour toutes les connexions — équivalent iOS du cleartext Android.</p>
+        </div>
+        <span class="sev-badge high">high</span>
+      </div>
+      <div class="card-body">
+        <h4>EXTRAIRE ET LIRE L'INFO.PLIST</h4>
+<pre><code>unzip app.ipa -d app_extracted
+find app_extracted -name "Info.plist"
+plutil -convert xml1 -o - app_extracted/Payload/*.app/Info.plist | grep -A 10 NSAppTransportSecurity</code></pre>
+        <p>Confirmer la présence de <code>NSAllowsArbitraryLoads = true</code> <strong>sans</strong> <code>NSExceptionDomains</code> qui restreindrait le scope.</p>
+        <h4>TEST DYNAMIQUE (si environnement dispo)</h4>
+<pre><code><span class="cm"># Proxy Burp sur simulateur/device iOS, naviguer dans l'app
+# Vérifier si du trafic HTTP non chiffré transite réellement</span></code></pre>
+        <div class="env-flag">Nécessite un Mac + Xcode Simulator ou un device iOS physique. Sans accès iOS, documenter uniquement sur preuve statique (Info.plist) et le préciser dans le rapport.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="group">
+  <div class="wrap">
+    <h2 class="med">SÉVÉRITÉ MEDIUM</h2>
+    <p class="sub">À confirmer et documenter — impact généralement plus limité ou plus contextuel que les High.</p>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Privacy Trackers</h3>
+          <p class="finding-text">1 tracker détecté dans l'application.</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+        <h4>IDENTIFIER LE SDK</h4>
+<pre><code>grep -riE "com.google.firebase.analytics|com.facebook.appevents|appsflyer|mixpanel" app_decoded/smali -r</code></pre>
+        <p>Vérifier ensuite si ce tracker envoie des données <strong>dès le lancement</strong>, avant tout consentement utilisateur — surveille le trafic réseau dans Burp dès l'ouverture de l'app.</p>
+        <div class="verdict">Impact réel = collecte avant consentement RGPD, à documenter si observé.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Création de fichier temporaire sensible</h3>
+          <p class="finding-text">android/print/PDFtoBase64.java:105 · CaptureManager.java:231</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+        <h4>CONTEXTE STATIQUE</h4>
+<pre><code>jadx-gui app.apk
+<span class="cm"># Ouvrir PDFtoBase64.java:105</span></code></pre>
+        <h4>OBSERVER EN DYNAMIQUE</h4>
+<pre><code><span class="cm"># Utiliser la fonctionnalité concernée (génération PDF, scan code-barres)</span>
+adb shell
+ls -la /data/data/&lt;package_name&gt;/cache/
+cat /data/data/&lt;package_name&gt;/cache/&lt;fichier_trouvé&gt;</code></pre>
+        <p>Confirmé si un fichier temporaire contient des données sensibles lisibles.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Secrets hardcodés</h3>
+          <p class="finding-text">FCMService.java · PushConstants.java · PromptInfo.java · Card.java (Samsung Pay)</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+        <h4>RECHERCHE</h4>
+<pre><code>grep -rEi "(api[_-]?key|secret|password|token|aws_access|BEGIN (RSA|EC) PRIVATE KEY)" app_decoded/ --include="*.smali" --include="*.xml"
+
+<span class="cm"># Outil dédié plus exhaustif</span>
+pip3 install trufflehog
+trufflehog filesystem app_decoded/</code></pre>
+        <p>Regarder en priorité les fichiers cités dans le rapport — souvent des faux positifs si c'est juste un nom de clé de config plutôt qu'un vrai secret.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Lecture/écriture External Storage</h3>
+          <p class="finding-text">Toute app avec READ_EXTERNAL_STORAGE peut lire les données écrites.</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+        <h4>EXPLORER</h4>
+<pre><code>adb shell
+<span class="cm"># Utiliser l'app normalement (upload justificatif, partage, etc.)</span>
+find /sdcard -iname "*byblos*" -o -iname "*mbanking*"
+ls -la /sdcard/Android/data/mobi.foo.byblos.mbanking/
+cat /sdcard/&lt;fichier_trouvé&gt;</code></pre>
+        <div class="verdict">Confirmé si des données sensibles sont lisibles depuis un contexte sans permission spéciale.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Random Number Generator faible</h3>
+          <p class="finding-text">Diagnostic.java:21 · FCMService.java:43</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+<pre><code>grep -rn "new Random(" app_decoded/
+grep -rn "SecureRandom" app_decoded/</code></pre>
+        <p>Si <code>new Random()</code> génère un token, un nonce ou un ID de transaction (pas juste une animation UI) → confirmé, prévisible et exploitable. Sinon, impact faible.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>SHA-1 dans RSA_OAEP</h3>
+          <p class="finding-text">com/nimbusds/jose/crypto/impl/RSA_OAEP.java:21,33</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+<pre><code>jadx-gui app.apk
+<span class="cm"># Ouvrir RSA_OAEP.java, lignes 21 et 33</span></code></pre>
+        <p>Vérifier si SHA-1 sert de digest/MGF1 dans OAEP — problématique surtout si utilisé pour signer/valider l'intégrité de données sensibles, moins critique pour du chiffrement interne non exposé.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h3>Composants IPC exportés</h3>
+          <p class="finding-text">Activities, Services, Broadcast Receivers partagés avec toute app du device.</p>
+        </div>
+        <span class="sev-badge med">medium</span>
+      </div>
+      <div class="card-body">
+        <h4>SETUP</h4>
+<pre><code>adb push drozer-agent.apk /sdcard/
+adb install drozer-agent.apk
+adb forward tcp:31415 tcp:31415
+drozer console connect</code></pre>
+        <h4>NON PROTÉGÉS — PRIORITÉ DE TEST</h4>
+<pre><code><span class="cm"># PushInstanceIDListenerService</span>
+run app.service.send mobi.foo.byblos.mbanking com.adobe.phonegap.push.PushInstanceIDListenerService --action "test" --extra string key value
+
+<span class="cm"># FCMService</span>
+run app.service.send mobi.foo.byblos.mbanking com.adobe.phonegap.push.FCMService --action "test" --extra string key value
+
+<span class="cm"># ShareChooserPendingIntent</span>
+run app.broadcast.send --component mobi.foo.byblos.mbanking nl.xservices.plugins.ShareChooserPendingIntent --action "android.intent.action.VIEW"</code></pre>
+        <h4>PROTÉGÉS PAR PERMISSION NON DÉFINIE DANS L'APP</h4>
+<pre><code><span class="cm"># PushHandlerActivity</span>
+run app.activity.start --component mobi.foo.byblos.mbanking com.adobe.phonegap.push.PushHandlerActivity
+
+<span class="cm"># ProfileInstallReceiver — android.permission.DUMP</span>
+run app.broadcast.send --component mobi.foo.byblos.mbanking androidx.profileinstaller.ProfileInstallReceiver --action "android.intent.action.MAIN"
+
+<span class="cm"># FirebaseInstanceIdReceiver — com.google.android.c2dm.permission.SEND</span>
+run app.broadcast.send --component mobi.foo.byblos.mbanking com.google.firebase.iid.FirebaseInstanceIdReceiver --action "com.google.android.c2dm.intent.RECEIVE"
+
+<span class="cm"># GenerateTapAndPayCredentialsService — SEND_ANDROID_PAY_DATA</span>
+run app.service.send mobi.foo.byblos.mbanking com.google.android.gms.tapandpay.issuer.GeneratePaymentCredentialsService --action "test"</code></pre>
+        <h4>OBSERVER</h4>
+<pre><code>adb logcat | grep -i mbanking</code></pre>
+        <div class="verdict"><strong>Priorise</strong> les 3 composants non protégés — le plus fort potentiel d'exploitation réelle. Les composants protégés par une permission <em>signature</em> (souvent le cas pour Google/Adobe/Firebase) sont fréquemment des faux positifs.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a href="index.html">← retour à la méthodologie</a> · Références : <a href="https://mas.owasp.org/MASTG/" target="_blank" rel="noopener">OWASP MASTG</a>
+  </div>
+</footer>
+
+</body>
+</html>
