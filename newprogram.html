@@ -38,12 +38,17 @@
     font-size: 16px;
     line-height: 1.5;
   }
-  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 72px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 24px 16px 56px; }
+  .layout { display: flex; flex-direction: column; }
+  .side { display: contents; }
+  .main { order: 1; min-width: 0; }
+  .maxes { order: 2; }
+  .sets { order: 3; }
   :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
   h1, h2, h3 { margin: 0; font-stretch: 62%; font-weight: 800; line-height: 1; }
   h1 { font-size: clamp(1.8rem, 7.2vw, 2.7rem); letter-spacing: .01em; word-spacing: .08em; text-transform: uppercase; }
-  .lede { max-width: 56ch; margin: 10px 0 0; color: var(--soft); font-size: .95rem; }
+  .lede { max-width: 80ch; margin: 10px 0 0; color: var(--soft); font-size: .95rem; }
 
   /* top bar */
   .topbar {
@@ -51,19 +56,20 @@
     font: 600 .72rem/1.4 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
   }
   .brand { color: var(--ink); }
+  .tnow { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .clock { color: var(--ink); font-variant-numeric: tabular-nums; }
   .brand b { color: var(--red); font-weight: 700; margin-right: 8px; }
 
   /* panels, in the spirit of a control-center dashboard */
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 14px 18px; }
   .panel { margin-top: 20px; }
-  details.panel:not([open]) { padding-bottom: 14px; }
   .panel-title {
     display: flex; align-items: center; gap: 12px; margin: 0; padding: 11px 14px;
     background: var(--inset); border-radius: 8px;
     font: 700 .78rem/1 var(--mono); letter-spacing: .22em; text-transform: uppercase; font-stretch: normal;
   }
   .panel-title::before { content: "\25B8"; font-size: .7rem; color: var(--red); }
-  .panel > p { margin: 12px 4px 0; color: var(--soft); font-size: .95rem; max-width: 62ch; }
+  .panel > p:not(.est-title) { margin: 12px 4px 0; color: var(--soft); font-size: .95rem; max-width: 62ch; }
 
   /* maxes */
   .maxes:focus-within { border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 0 26px var(--glow); }
@@ -86,23 +92,14 @@
     text-decoration: underline; text-underline-offset: 4px;
   }
   .reset:hover { color: var(--ink); }
-  summary { cursor: pointer; }
-  details.estimator { margin: 14px 4px 0; }
-  .estimator > summary { font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
-  .estimator > summary::marker { color: var(--red); }
-  summary.panel-title { list-style: none; }
-  summary.panel-title::-webkit-details-marker { display: none; }
-  summary.panel-title > span:first-child { margin-right: auto; }
-  details[open] > summary.panel-title::before { content: "\25BE"; }
-  .edit { font-weight: 400; font-size: .64rem; letter-spacing: .14em; color: var(--muted); }
-  .edit::after { content: attr(data-closed); }
-  details[open] > summary .edit::after { content: attr(data-open); }
-  .est-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .estimator { margin: 16px 4px 0; padding-top: 14px; border-top: 1px solid var(--line); }
+  .est-title { margin: 0; font: 700 .68rem/1.2 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--soft); }
+  .est-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
   .est-row .wide { grid-column: 1 / -1; }
-  .maxes .est-out { margin: 12px 0 0; font: 600 .9rem var(--mono); color: var(--ink); }
+  .maxes .est-out { margin: 12px 0 0; font: 600 .78rem/1.4 var(--mono); color: var(--soft); }
 
   /* week of plates */
-  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 24px 0 6px; }
+  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 22px 0 6px; max-width: 640px; }
   .day-btn {
     display: flex; flex-direction: column; align-items: center; gap: 5px;
     padding: 6px 0 2px; background: none; border: 0; border-radius: 14px;
@@ -114,7 +111,7 @@
   }
   .plate::before {
     content: ""; position: absolute; inset: 9%; border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, .42);
+    border: 2px solid rgba(255, 255, 255, .34); border-top-color: rgba(255, 255, 255, .9);
   }
   .hole {
     position: relative; width: 46%; aspect-ratio: 1; border-radius: 50%;
@@ -126,6 +123,20 @@
   .day-btn.is-rest .plate::before { display: none; }
   .day-btn.is-rest .hole { background: transparent; color: var(--muted); }
   .day-btn[aria-pressed="true"] .plate { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
+
+  /* motion: the chosen plate rolls, the day card rises in */
+  @keyframes roll { from { transform: rotate(-360deg); } to { transform: rotate(0); } }
+  @keyframes pop { 0% { transform: scale(.86); } 55% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .day-btn[aria-pressed="true"] .plate { animation: pop .5s cubic-bezier(.2, .8, .3, 1) both; }
+  .day-btn[aria-pressed="true"] .plate::before { animation: roll .7s cubic-bezier(.2, .8, .3, 1) both; }
+  .day.anim .dhead { animation: rise .4s cubic-bezier(.2, .7, .2, 1) both; }
+  .day.anim .focus, .day.anim .rest-list { animation: rise .4s .1s cubic-bezier(.2, .7, .2, 1) both; }
+  .day.anim .ex { animation: rise .4s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 45ms + 90ms); }
+  @media (prefers-reduced-motion: reduce) {
+    .day-btn .plate, .day-btn .plate::before, .day.anim .dhead, .day.anim .focus,
+    .day.anim .rest-list, .day.anim .ex { animation: none !important; }
+  }
   .wd { font: 700 .72rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
   .nm { font: 400 .66rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
   .day-btn.is-today .wd::after {
@@ -158,9 +169,11 @@
   .dfacts { margin: 10px 0 0; font: 600 .8rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
   .focus { margin: 0; padding: 16px 20px; color: var(--soft); max-width: 62ch; }
 
+  .exlist { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line); }
+  .exlist > .ex:last-child { border-bottom: 0; }
   .ex {
-    display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: start;
-    padding: 14px 20px; border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: start; align-content: start;
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
   }
   .ex-main { min-width: 0; display: grid; gap: 5px; }
   .ex h3 { font-stretch: 75%; font-size: 1.35rem; font-weight: 750; line-height: 1.1; }
@@ -182,7 +195,7 @@
   .rest-list { margin: 0; padding: 4px 20px 24px 40px; display: grid; gap: 10px; max-width: 64ch; color: var(--soft); border-top: 1px solid var(--line); padding-top: 18px; }
 
   /* sections below */
-  .vrow { display: grid; grid-template-columns: 8.5rem 1fr 2rem; align-items: center; gap: 10px; padding: 5px 0; }
+  .vrow { display: grid; grid-template-columns: 6.4rem 1fr 1.8rem; align-items: center; gap: 10px; padding: 5px 0; }
   .vrow span:first-child { font: 600 .72rem/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
   .vrow span:last-child { text-align: right; font: 700 .85rem var(--mono); }
   .track { position: relative; height: 12px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--inset); overflow: hidden; }
@@ -202,42 +215,63 @@
     .est-row .wide { grid-column: auto; }
     .rest-list { padding-left: 48px; }
   }
+  @media (min-width: 700px) {
+    .exlist { grid-template-columns: 1fr 1fr; }
+    .dname { max-width: none; }
+    .exlist > .ex:nth-child(odd) { border-right: 1px solid var(--line); }
+    .exlist > .ex:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
+    .exlist > .ex:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+    .ex { padding-left: 22px; padding-right: 22px; }
+  }
+  @media (min-width: 900px) {
+    .layout { gap: 20px; }
+    .side { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+    .side .panel { margin-top: 0; order: 0; }
+    .main { order: 0; }
+    .strip { margin-top: 0; }
+    .day { margin-top: 14px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="topbar"><span class="brand"><b>&#9672;</b>4-day split</span><span id="today"></span></div>
+    <div class="topbar"><span class="brand"><b>&#9672;</b>4-day split</span><span class="tnow"><span id="today"></span><span class="clock" id="clock"></span></span></div>
     <h1>4 days a week. Muscle first, strength second.</h1>
     <p class="lede">Heavy lifts: 3 to 4 sets, stopped short of failure. Everything else: 2 sets to failure.</p>
   </header>
 
-  <details class="maxes panel">
-    <summary class="panel-title"><span>Your maxes</span><span class="edit" data-closed="Tap to edit" data-open="Close"></span></summary>
-    <p>1-rep maxes in kg. For pull-up and dip, enter the added weight. A ~ before a weight marks an estimate.</p>
-    <div class="fields" id="fields"></div>
-    <button class="reset" id="reset-maxes" type="button">Reset to preset</button>
-    <details class="estimator">
-      <summary>Don't know your max? Estimate it from a hard set</summary>
-      <div class="est-row">
-        <label class="field wide">Lift <select id="e-lift" autocomplete="off"></select></label>
-        <label class="field"><span id="e-wl">Weight (kg)</span><input id="e-w" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg" autocomplete="off"></label>
-        <label class="field">Reps<input id="e-r" type="number" inputmode="numeric" min="1" max="20" step="1" placeholder="reps" autocomplete="off"></label>
-      </div>
-      <p class="est-out" id="e-out" aria-live="polite"></p>
-    </details>
-  </details>
+  <div class="layout">
+    <aside class="side">
+      <section class="maxes panel" aria-labelledby="max-h">
+        <h2 class="panel-title" id="max-h">Your maxes</h2>
+        <p>1-rep maxes in kg. For pull-up and dip, enter the added weight. A ~ before a weight marks an estimate.</p>
+        <div class="fields" id="fields"></div>
+        <button class="reset" id="reset-maxes" type="button">Reset to preset</button>
+        <div class="estimator">
+          <p class="est-title">Estimate a max from a hard set</p>
+          <div class="est-row">
+            <label class="field wide">Lift <select id="e-lift" autocomplete="off"></select></label>
+            <label class="field"><span id="e-wl">Weight (kg)</span><input id="e-w" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg" autocomplete="off"></label>
+            <label class="field">Reps<input id="e-r" type="number" inputmode="numeric" min="1" max="20" step="1" placeholder="reps" autocomplete="off"></label>
+          </div>
+          <p class="est-out" id="e-out" aria-live="polite"></p>
+        </div>
+      </section>
 
-  <nav class="strip" id="strip" aria-label="Weekly schedule"></nav>
-  <p class="hint">Tap a plate to open a day. The red dot marks today.</p>
+      <section class="sets panel" aria-labelledby="vol-h">
+        <h2 class="panel-title" id="vol-h">Weekly sets per muscle</h2>
+        <p class="sub">Compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual growth range. Rear delts and abs sit below it, and calves get no direct work.</p>
+        <div class="vol" id="vol"></div>
+      </section>
+    </aside>
 
-  <section class="day" id="detail"></section>
-
-  <details class="panel">
-    <summary class="panel-title"><span>Weekly sets per muscle</span><span class="edit" data-closed="Tap to open" data-open="Close"></span></summary>
-    <p class="sub">Sets from compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual range for growth; sets taken to failure let you sit near the low end. Rear delts and abs sit below it, and calves get no direct work.</p>
-    <div class="vol" id="vol"></div>
-  </details>
+    <main class="main">
+      <nav class="strip" id="strip" aria-label="Weekly schedule"></nav>
+      <p class="hint">Tap a plate to open a day. The red dot marks today.</p>
+      <section class="day" id="detail"></section>
+    </main>
+  </div>
 
   <footer>
     <p>Nothing is saved. Reloading the page restores your preset maxes.</p>
@@ -401,7 +435,7 @@
   ];
 
   var MUSCLES = [
-    ["chest", "Chest"], ["back", "Back"], ["delts", "Front & side delts"], ["rear", "Rear delts"],
+    ["chest", "Chest"], ["back", "Back"], ["delts", "Delts"], ["rear", "Rear delts"],
     ["biceps", "Biceps"], ["triceps", "Triceps"], ["quads", "Quads"], ["hams", "Hams & glutes"],
     ["abs", "Abs"]
   ];
@@ -523,8 +557,9 @@
   }
 
   /* ---------- Day card ---------- */
-  function renderDay() {
+  function renderDay(animate) {
     var d = DAYS[state.sel];
+    detail.classList.toggle("anim", !!animate);
     detail.style.setProperty("--accent", "var(--" + (d.color || "rest") + ")");
     detail.style.setProperty("--on-accent", d.color === "yellow" ? "#111" : "#fff");
     var head = '<header class="dhead"><div class="dtop"><span>Day ' + d.n + '</span><span>' + d.full + '</span></div>' +
@@ -536,24 +571,30 @@
         d.tips.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
       return;
     }
-    detail.innerHTML = head + d.ex.map(function (e) {
+    detail.innerHTML = head + '<div class="exlist">' + d.ex.map(function (e, i) {
       var mt = /^(.*?)\s*\((.*)\)$/.exec(e.name);
       var title = mt ? mt[1] : e.name;
       var tags = (mt || e.target)
         ? '<div class="tags">' + (mt ? '<span class="role">' + esc(mt[2]) + '</span>' : '') +
           (e.target ? '<span class="tag">Target lift</span>' : '') + '</div>'
         : '';
-      return '<article class="ex"><div class="ex-main"><h3>' + esc(title) + '</h3>' + tags +
+      return '<article class="ex" style="--i:' + Math.min(i, 8) + '"><div class="ex-main"><h3>' + esc(title) + '</h3>' + tags +
         '<span class="scheme">' + e.sets + ' sets × ' + e.reps + ' reps</span>' +
         '<div class="meta"><span>Rest ' + e.rest + '</span><span>' + effort(e) + '</span></div></div>' +
         weightBlock(e) + '<p class="note">' + esc(e.note) + '</p></article>';
-    }).join("");
+    }).join("") + '</div>';
   }
 
+  var lastDayIdx = todayIndex();
   function renderToday() {
     var t = new Date(), d = DAYS[todayIndex()];
     var s = t.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
     $("today").textContent = s + "  /  " + (d.rest ? "Rest day" : d.name + " day");
+    $("clock").textContent = t.toLocaleTimeString("en-GB", { hourCycle: "h23", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+  function tick() {
+    renderToday();
+    if (todayIndex() !== lastDayIdx) { lastDayIdx = todayIndex(); renderStrip(); } // past midnight
   }
 
   /* ---------- Volume ---------- */
@@ -580,7 +621,11 @@
     if (!b) return;
     state.sel = Number(b.getAttribute("data-i"));
     renderStrip();
-    renderDay();
+    renderDay(true);
+    if (ev.detail === 0) { // keyboard: keep focus on the plate
+      var cur = strip.querySelector('[aria-pressed="true"]');
+      if (cur) cur.focus();
+    }
   });
   $("reset-maxes").addEventListener("click", function () {
     applyPreset();
@@ -601,8 +646,9 @@
   applyPreset();
   syncMaxes();
   renderToday();
+  setInterval(tick, 1000);
   renderStrip();
-  renderDay();
+  renderDay(true);
   renderVolume();
   updateEstimator();
 })();
