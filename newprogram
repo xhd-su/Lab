@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4-day hypertrophy split</title>
+<meta name="description" content="Pull, push, legs, arms and shoulders. A 4-day split built for muscle first, strength second, with target weights worked out from your maxes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%232758C9'/%3E%3Ccircle cx='16' cy='16' r='5' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E8EBEF;
+    --surface: #FFFFFF;
+    --ink: #15181D;
+    --muted: #59626E;
+    --line: #CDD3DA;
+    --rest: #8993A0;
+    --red: #D63A2F;
+    --blue: #2758C9;
+    --yellow: #EDB10C;
+    --green: #1E9A55;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151A;
+      --surface: #1B1F26;
+      --ink: #EDF0F3;
+      --muted: #9AA4B1;
+      --line: #313843;
+      --rest: #6B7583;
+      --blue: #4B7BEB;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 18px 72px; }
+
+  h1, h2, h3 { margin: 0; font-stretch: 62%; font-weight: 800; line-height: 1; }
+  h1 { font-size: clamp(2.7rem, 12vw, 4.8rem); letter-spacing: .005em; }
+  h2 { font-size: clamp(2rem, 8vw, 2.6rem); }
+  .lede { max-width: 56ch; margin: 18px 0 0; color: var(--muted); font-size: 1.05rem; }
+
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  /* maxes */
+  .maxes { margin-top: 30px; background: var(--surface); border-radius: 18px; padding: 22px 20px 20px; }
+  .maxes h2 { font-size: clamp(2rem, 8vw, 2.4rem); }
+  .maxes p { margin: 10px 0 0; color: var(--muted); font-size: .95rem; max-width: 62ch; }
+  .fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 12px; margin-top: 18px; }
+  .field { display: grid; gap: 5px; font-size: .88rem; font-weight: 600; align-content: end; }
+  .maxes input, .maxes select {
+    width: 100%; height: 44px; padding: 0 12px;
+    border: 2px solid var(--line); border-radius: 10px; background: transparent;
+    color: var(--ink); font: inherit; font-weight: 650;
+  }
+  .maxes select { padding-right: 6px; }
+  details { margin-top: 18px; }
+  summary { cursor: pointer; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+  .est-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+  .est-row .wide { grid-column: 1 / -1; }
+  .est-out { margin: 12px 0 0; font-weight: 650; color: var(--ink); }
+
+  /* week of plates */
+  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 40px 0 10px; }
+  .day-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px 0 2px; background: none; border: 0; border-radius: 14px;
+    color: inherit; font: inherit; cursor: pointer;
+  }
+  .plate {
+    position: relative; width: 100%; max-width: 68px; aspect-ratio: 1;
+    border-radius: 50%; background: var(--c); display: grid; place-items: center;
+  }
+  .plate::before {
+    content: ""; position: absolute; inset: 9%; border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, .42);
+  }
+  .hole {
+    position: relative; width: 46%; aspect-ratio: 1; border-radius: 50%;
+    background: var(--bg); color: var(--ink);
+    display: grid; place-items: center;
+    font-stretch: 75%; font-weight: 800; font-size: clamp(.8rem, 3.8vw, 1.15rem);
+  }
+  .day-btn.is-rest .plate { background: transparent; border: 2px dashed var(--line); }
+  .day-btn.is-rest .plate::before { display: none; }
+  .day-btn.is-rest .hole { background: transparent; color: var(--muted); }
+  .day-btn[aria-pressed="true"] .plate { box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px var(--ink); }
+  .wd { font-size: .82rem; font-weight: 650; }
+  .nm { font-size: .78rem; color: var(--muted); }
+  .day-btn.is-today .wd::after {
+    content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ink); margin-left: 4px; vertical-align: middle;
+  }
+  .hint { margin: 14px 0 0; color: var(--muted); font-size: .92rem; max-width: 60ch; }
+
+  /* day card */
+  .day {
+    margin-top: 26px; background: var(--surface); border-radius: 18px;
+    border-top: 8px solid var(--accent); overflow: hidden;
+  }
+  .head { padding: 22px 20px 20px; }
+  .kicker { margin: 0 0 8px; color: var(--muted); font-size: .92rem; font-weight: 600; }
+  .head h2 { font-size: clamp(2.4rem, 10vw, 3.6rem); }
+  .focus { margin: 12px 0 0; color: var(--muted); max-width: 56ch; }
+  .facts { margin: 12px 0 0; font-weight: 650; }
+
+  .ex {
+    display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; align-items: start;
+    padding: 18px 20px; border-top: 1px solid var(--line);
+  }
+  .ex-main { min-width: 0; display: grid; gap: 6px; }
+  .ex h3 { font-stretch: 75%; font-size: 1.45rem; font-weight: 750; line-height: 1.1; }
+  .scheme { font-weight: 700; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; color: var(--muted); font-size: .9rem; }
+  .tag {
+    color: var(--ink); font-weight: 650; font-size: .8rem;
+    padding: 1px 9px; border-radius: 999px; border: 2px solid var(--accent);
+  }
+  .wt { text-align: right; }
+  .wt strong { display: block; font-stretch: 62%; font-weight: 800; font-size: 2.5rem; line-height: 1; }
+  .wt span { display: block; margin-left: auto; max-width: 9.5rem; font-size: .8rem; color: var(--muted); line-height: 1.25; }
+  .wt.txt strong { font-stretch: 75%; font-size: 1.3rem; padding-top: 6px; }
+  .wt.pending strong { color: var(--rest); }
+  .note { grid-column: 1 / -1; margin: 4px 0 0; color: var(--muted); font-size: .95rem; max-width: 60ch; }
+
+  .rest-list { margin: 0; padding: 4px 20px 24px 38px; display: grid; gap: 10px; max-width: 64ch; }
+
+  /* sections below */
+  section.plain { margin-top: 56px; padding-top: 24px; border-top: 2px solid var(--ink); }
+  .rules { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 14px; max-width: 64ch; }
+  .rules strong { font-weight: 750; }
+  .sub { margin: 14px 0 0; color: var(--muted); font-size: .95rem; max-width: 64ch; }
+
+  .vrow { display: grid; grid-template-columns: 8rem 1fr 2rem; align-items: center; gap: 10px; padding: 5px 0; }
+  .vrow span:first-child { font-size: .95rem; }
+  .vrow span:last-child { text-align: right; font-weight: 700; }
+  .track { position: relative; height: 14px; border-radius: 7px; border: 1px solid var(--line); overflow: hidden; }
+  .band { position: absolute; top: 0; bottom: 0; background: color-mix(in srgb, var(--ink) 9%, transparent); }
+  .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); border-radius: 7px; }
+  .vol { margin-top: 18px; max-width: 560px; }
+
+  footer { margin-top: 56px; color: var(--muted); font-size: .9rem; }
+  footer p { margin: 0; }
+
+  @media (min-width: 640px) {
+    .wrap { padding-top: 56px; }
+    .maxes, .head, .ex { padding-left: 28px; padding-right: 28px; }
+    .fields { grid-template-columns: repeat(4, 1fr); }
+    .est-row { grid-template-columns: 2fr 1fr 1fr; }
+    .est-row .wide { grid-column: auto; }
+    .rest-list { padding-left: 46px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>4 days a week. Muscle first, strength second.</h1>
+    <p class="lede">Pull and push back to back on the weekend, legs on Tuesday, arms and shoulders on Thursday. The heavy lifts get 3 to 4 sets stopped short of failure. Everything else gets 2 sets taken to failure. Enter your maxes and every weight is worked out for you.</p>
+  </header>
+
+  <section class="maxes" aria-labelledby="max-h">
+    <h2 id="max-h">Your maxes</h2>
+    <p>The most you can lift for 1 rep, in kg. For pull-ups and dips, enter the extra weight you can add for 1 rep; use 0 if you can only do bodyweight. Target weights below update as you type.</p>
+    <div class="fields" id="fields"></div>
+    <p>Bench, squat, deadlift, overhead press, pull-ups and dips come straight from your max. Every other exercise is an estimate from typical strength ratios and is marked as one. Treat those as a first guess and adjust after your first session.</p>
+    <details>
+      <summary>Don't know your max? Estimate it from a hard set</summary>
+      <div class="est-row">
+        <label class="field wide">Lift <select id="e-lift" autocomplete="off"></select></label>
+        <label class="field"><span id="e-wl">Weight (kg)</span><input id="e-w" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg" autocomplete="off"></label>
+        <label class="field">Reps<input id="e-r" type="number" inputmode="numeric" min="1" max="20" step="1" placeholder="reps" autocomplete="off"></label>
+      </div>
+      <p class="est-out" id="e-out" aria-live="polite"></p>
+    </details>
+  </section>
+
+  <nav class="strip" id="strip" aria-label="Weekly schedule"></nav>
+  <p class="hint">The week starts on Saturday so the two back-to-back days land on the weekend. Tap a plate to open that day. The dot marks today.</p>
+
+  <section class="day" id="detail"></section>
+
+  <section class="plain" aria-labelledby="prog-h">
+    <h2 id="prog-h">How to train it</h2>
+    <ul class="rules">
+      <li><strong>Reading the weights.</strong> Each target is the load for the bottom of the rep range at the effort shown. Start there and add reps each week.</li>
+      <li><strong>Moving up.</strong> When every set reaches the top of the rep range, raise that lift's max above (bench and overhead press +2.5 kg, squat and deadlift +5 kg, pull-ups and dips +1 to 2.5 kg) and the targets follow.</li>
+      <li><strong>Heavy lifts.</strong> 3 to 4 sets at the same weight, stopping with 1 or 2 reps left. Not to failure.</li>
+      <li><strong>Everything else.</strong> 2 working sets, both taken to failure: the last rep you can do with clean form, not a grinder. Squat, bench and overhead press always get safeties or a spotter.</li>
+      <li><strong>Warm-up.</strong> Before the first lift of each day, do 3 lighter ramp-up sets. Before each other exercise, 1 light set. None of these count as working sets.</li>
+      <li><strong>Deload.</strong> Every 6 to 8 weeks, or when your reps drop two weeks in a row: half the sets, weights about 10% lighter, for one week.</li>
+    </ul>
+  </section>
+
+  <section class="plain" aria-labelledby="vol-h">
+    <h2 id="vol-h">Weekly sets per muscle</h2>
+    <p class="sub">Sets from compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual range for growth; sets taken to failure let you sit near the low end. Rear delts and abs sit below it, and calves get no direct work, so add sets there if they are a weak point.</p>
+    <div class="vol" id="vol"></div>
+  </section>
+
+  <footer>
+    <p>Nothing is saved. Your maxes are cleared when you reload the page.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Program data: edit this to change the plan ----------
+     ref    : which max drives the weight (bench, squat, deadlift, ohp, pullup, dip)
+     ratio  : this exercise's "max" as a fraction of the reference max (estimates)
+     rir    : reps left in reserve. 0 = to failure
+     step   : rounding step for the target weight
+  */
+  var DAYS = [
+    { n: 1, wd: "Sat", full: "Saturday", label: "Pull", name: "Pull", color: "blue", min: 65,
+      focus: "Back, rear delts and biceps. Deadlift and pull-ups come first, then one vertical and one horizontal pull, a rear delt exercise, and two curls.",
+      ex: [
+        { id: "pull-dl", name: "Deadlift", sets: 3, reps: "4–6", rest: "3–4 min", rir: 2, target: true,
+          ref: "deadlift", ratio: 1, step: 2.5, unit: "kg",
+          note: "Three sets at the same weight. Reset your back on every rep.",
+          m: { back: 1, hams: 1 } },
+        { id: "pull-pu", name: "Weighted pull-up", sets: 3, reps: "6–10", rest: "2–3 min", rir: 1, target: true,
+          ref: "pullup", ratio: 1,
+          note: "Dead hang to chin over the bar. Under 6 bodyweight reps? Use a band or slow negatives.",
+          m: { back: 1, biceps: 0.5 } },
+        { id: "pull-pd", name: "Lat pulldown (vertical pull)", sets: 2, reps: "8–12", rest: "2 min", rir: 0,
+          ref: "bench", ratio: 0.85, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Lean back slightly and pull the bar to your upper chest. Control the way up.",
+          m: { back: 1, biceps: 0.5 } },
+        { id: "pull-row", name: "Chest-supported row (horizontal pull)", sets: 2, reps: "8–12", rest: "2 min", rir: 0,
+          ref: "bench", ratio: 0.7, est: true, step: 2.5, unit: "kg",
+          note: "The pad spares your lower back after deadlifts. Pull elbows toward your hips and pause 1 second at the top.",
+          m: { back: 1, rear: 0.5, biceps: 0.5 } },
+        { id: "pull-fp", name: "Face pull (rear delts)", sets: 2, reps: "15–20", rest: "90 s", rir: 0,
+          ref: "ohp", ratio: 0.5, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Rope to forehead height, pull the ends apart. Keeps your shoulders healthy for pressing.",
+          m: { rear: 1 } },
+        { id: "pull-inc", name: "Incline dumbbell curl (arms behind you)", sets: 2, reps: "8–12", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.17, est: true, step: 1, unit: "kg per hand",
+          note: "Bench at 45 degrees, arms hanging behind your body for a deep stretch at the bottom.",
+          m: { biceps: 1 } },
+        { id: "pull-prc", name: "Preacher curl (arms in front)", sets: 2, reps: "8–12", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.4, est: true, step: 2.5, unit: "kg on the bar",
+          note: "EZ bar or machine. Arms rest on the pad in front of you, so there is no swinging. Lower slowly.",
+          m: { biceps: 1 } }
+      ] },
+    { n: 2, wd: "Sun", full: "Sunday", label: "Push", name: "Push", color: "red", min: 55,
+      focus: "Chest, side delts and triceps. Bench press leads, then a press and a fly for chest, a side delt raise, and an overhead and a pushdown for triceps.",
+      ex: [
+        { id: "push-bench", name: "Bench press", sets: 4, reps: "5–8", rest: "3 min", rir: 2, target: true,
+          ref: "bench", ratio: 1, step: 2.5, unit: "kg",
+          note: "Shoulder blades back and down, feet planted. Use safeties or a spotter.",
+          m: { chest: 1, triceps: 0.5, delts: 0.5 } },
+        { id: "push-inc", name: "Incline dumbbell press (chest press)", sets: 2, reps: "8–12", rest: "2 min", rir: 0,
+          ref: "bench", ratio: 0.37, est: true, step: 1, unit: "kg per hand",
+          note: "Bench at 30 degrees. Lower for 3 seconds and get a full stretch at the bottom.",
+          m: { chest: 1, delts: 0.5, triceps: 0.5 } },
+        { id: "push-fly", name: "Low-to-high cable fly (chest fly)", sets: 2, reps: "12–15", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.2, est: true, step: 2.5, unit: "kg per side",
+          note: "Slight bend in the elbows, hands meet at chest height. Squeeze for a beat.",
+          m: { chest: 1 } },
+        { id: "push-lat", name: "Cable lateral raise (side delts)", sets: 2, reps: "12–20", rest: "90 s", rir: 0,
+          ref: "ohp", ratio: 0.15, est: true, step: 1.25, unit: "kg per arm",
+          note: "Cable set low, working arm across your body. Lead with the elbow, stop at shoulder height.",
+          m: { delts: 1 } },
+        { id: "push-oh", name: "Overhead triceps extension", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.35, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Cable or dumbbell. Elbows point forward, deep stretch at the bottom.",
+          m: { triceps: 1 } },
+        { id: "push-pd", name: "Triceps pushdown", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.45, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Elbows pinned to your sides. Full lockout, slow return.",
+          m: { triceps: 1 } }
+      ] },
+    { n: 3, wd: "Mon", full: "Monday", label: "Rest", rest: true, name: "Rest",
+      focus: "Recover after two days in a row.",
+      tips: [
+        "Walk 20 to 30 minutes, or aim for 8,000 to 10,000 steps.",
+        "Eat at maintenance or a small surplus, with 1.6 to 2.2 g of protein per kg of bodyweight.",
+        "Tuesday is squat day: spend 10 minutes on hip and ankle mobility."
+      ] },
+    { n: 4, wd: "Tue", full: "Tuesday", label: "Legs", name: "Legs", color: "yellow", min: 55,
+      focus: "Quads and hamstrings, then abs. Squat first, with three days since your deadlift.",
+      ex: [
+        { id: "legs-sq", name: "Back squat", sets: 4, reps: "5–8", rest: "3 min", rir: 2, target: true,
+          ref: "squat", ratio: 1, step: 2.5, unit: "kg",
+          note: "At least to parallel, safeties set.",
+          m: { quads: 1, hams: 0.5 } },
+        { id: "legs-lp", name: "Leg press", sets: 2, reps: "10–15", rest: "2 min", rir: 0,
+          ref: "squat", ratio: 2, est: true, step: 5, unit: "kg",
+          note: "Deep range, feet mid-platform. Sleds and machines differ a lot, so this is only a starting point.",
+          m: { quads: 1 } },
+        { id: "legs-lc", name: "Lying leg curl", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: "squat", ratio: 0.5, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Slow lowering, hips pressed into the pad.",
+          m: { hams: 1 } },
+        { id: "legs-le", name: "Leg extension", sets: 2, reps: "12–15", rest: "90 s", rir: 0,
+          ref: "squat", ratio: 0.6, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Pause at the top for a second.",
+          m: { quads: 1 } },
+        { id: "legs-hlr", name: "Hanging leg raise", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: null,
+          note: "Tilt the pelvis up at the top, no swinging.",
+          m: { abs: 1 } },
+        { id: "legs-cc", name: "Cable crunch", sets: 2, reps: "12–15", rest: "90 s", rir: 0,
+          ref: "squat", ratio: 0.5, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Kneel, round your spine and pull your ribs to your pelvis. The hips stay still.",
+          m: { abs: 1 } }
+      ] },
+    { n: 5, wd: "Wed", full: "Wednesday", label: "Rest", rest: true, name: "Rest",
+      focus: "Between legs and arms. Nothing to lift.",
+      tips: [
+        "Easy walk, and get 7 to 9 hours of sleep. Most growth happens there.",
+        "Optional: 10 minutes of shoulder and upper-back mobility before Thursday's overhead press."
+      ] },
+    { n: 6, wd: "Thu", full: "Thursday", label: "Arms", name: "Arms & shoulders", color: "green", min: 65,
+      focus: "Overhead press first, then weighted dips, your only dip session of the week, then triceps, biceps and delts.",
+      ex: [
+        { id: "arms-ohp", name: "Overhead press (barbell)", sets: 4, reps: "5–8", rest: "3 min", rir: 2, target: true,
+          ref: "ohp", ratio: 1, step: 2.5, unit: "kg",
+          note: "Standing, glutes and abs tight, bar travels straight up past your face.",
+          m: { delts: 1, triceps: 0.5 } },
+        { id: "arms-dip", name: "Weighted dip", sets: 3, reps: "6–10", rest: "2–3 min", rir: 1, target: true,
+          ref: "dip", ratio: 1,
+          note: "Your only dip session of the week. Full depth, elbows tucked, torso slightly forward so chest and triceps share the work.",
+          m: { triceps: 1, chest: 0.5 } },
+        { id: "arms-sk", name: "Skull crusher (EZ bar)", sets: 2, reps: "8–12", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.4, est: true, step: 2.5, unit: "kg on the bar",
+          note: "Lower the bar toward your forehead, elbows fixed. Use a spotter or light enough load to control it.",
+          m: { triceps: 1 } },
+        { id: "arms-sap", name: "Single-arm cable pushdown", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.25, est: true, step: 2.5, unit: "kg per arm",
+          note: "Elbow pinned to your side, full lockout. Do both arms for each set.",
+          m: { triceps: 1 } },
+        { id: "arms-ham", name: "Hammer curl", sets: 2, reps: "8–12", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.19, est: true, step: 1, unit: "kg per hand",
+          note: "Neutral grip, no swinging. Also works the forearms.",
+          m: { biceps: 1 } },
+        { id: "arms-cc", name: "Cable curl", sets: 2, reps: "10–15", rest: "90 s", rir: 0,
+          ref: "bench", ratio: 0.33, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Standing, elbows by your sides. The cable keeps tension on the biceps at the bottom.",
+          m: { biceps: 1 } },
+        { id: "arms-lat", name: "Lateral raise", sets: 2, reps: "12–20", rest: "90 s", rir: 0,
+          ref: "ohp", ratio: 0.2, est: true, step: 1, unit: "kg per hand",
+          note: "Lean slightly, lead with the elbows, stop at shoulder height.",
+          m: { delts: 1 } },
+        { id: "arms-rear", name: "Rear delt fly", sets: 2, reps: "15–20", rest: "60–90 s", rir: 0,
+          ref: "ohp", ratio: 0.3, est: true, step: 2.5, unit: "kg on the stack",
+          note: "Reverse pec deck or cables. Light and controlled.",
+          m: { rear: 1 } }
+      ] },
+    { n: 7, wd: "Fri", full: "Friday", label: "Rest", rest: true, name: "Rest",
+      focus: "Last rest before the weekend block.",
+      tips: [
+        "Saturday opens with heavy deadlifts, so go in fresh: sleep well and eat enough carbs today.",
+        "Plan your first top set the night before so you do not waste energy deciding."
+      ] }
+  ];
+
+  var MUSCLES = [
+    ["chest", "Chest"], ["back", "Back"], ["delts", "Front & side delts"], ["rear", "Rear delts"],
+    ["biceps", "Biceps"], ["triceps", "Triceps"], ["quads", "Quads"], ["hams", "Hams & glutes"],
+    ["abs", "Abs"]
+  ];
+
+  var FIELDS = [
+    { k: "bw", label: "Bodyweight" },
+    { k: "bench", label: "Bench press" },
+    { k: "squat", label: "Squat" },
+    { k: "deadlift", label: "Deadlift" },
+    { k: "ohp", label: "Overhead press" },
+    { k: "pullup", label: "Pull-up, added weight" },
+    { k: "dip", label: "Dip, added weight" }
+  ];
+  var HINT = {
+    bench: "add your bench max", squat: "add your squat max", deadlift: "add your deadlift max",
+    ohp: "add your press max", pullup: "add your pull-up max", dip: "add your dip max"
+  };
+
+  /* ---------- Helpers ---------- */
+  var maxes = {};
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+  function num(v) {
+    var x = parseFloat(String(v).replace(",", "."));
+    return isFinite(x) && x >= 0 ? x : null;
+  }
+  function roundTo(x, s) { return Math.round(x / s) * s; }
+  function fmt(v) { return String(Math.round(v * 100) / 100); }
+  function todayIndex() { return (new Date().getDay() + 1) % 7; } // Saturday = 0
+  function firstTrainingFrom(i) { while (DAYS[i].rest) i = (i + 1) % 7; return i; }
+  function setsOf(d) { return d.ex.reduce(function (a, e) { return a + e.sets; }, 0); }
+  function effort(e) {
+    if (e.rir === 0) return "Go to failure";
+    return "Stop with " + e.rir + (e.rir === 1 ? " rep" : " reps") + " left";
+  }
+
+  /* Target weight: Epley formula, load = max / (1 + reps_to_failure / 30),
+     using the bottom of the rep range plus reps left in reserve. */
+  function target(e) {
+    if (!e.ref) return { text: "Bodyweight", sub: "no load needed" };
+    var added = e.ref === "pullup" || e.ref === "dip";
+    var m = maxes[e.ref];
+    if (m == null) return { pending: true, hint: HINT[e.ref] };
+    if (added && maxes.bw == null) return { pending: true, hint: "add your bodyweight" };
+    var base = added ? maxes.bw + m : m;
+    var n = parseInt(e.reps, 10) + e.rir;
+    var load = e.ratio * base / (1 + n / 30);
+    var est = e.est ? ", estimate" : "";
+    if (added) {
+      load -= maxes.bw;
+      if (load < 0.625) return { text: "Bodyweight", sub: "no added weight yet" + est };
+      return { value: "+" + fmt(roundTo(load, 1.25)), unit: "kg added" + est };
+    }
+    return { value: fmt(Math.max(e.step, roundTo(load, e.step))), unit: e.unit + est };
+  }
+
+  function weightBlock(e) {
+    var t = target(e);
+    if (t.pending) return '<div class="wt pending"><strong>–</strong><span>' + esc(t.hint) + '</span></div>';
+    if (t.text) return '<div class="wt txt"><strong>' + esc(t.text) + '</strong><span>' + esc(t.sub) + '</span></div>';
+    return '<div class="wt"><strong>' + esc(t.value) + '</strong><span>' + esc(t.unit) + '</span></div>';
+  }
+
+  var state = { sel: firstTrainingFrom(todayIndex()) };
+  var strip = $("strip");
+  var detail = $("detail");
+
+  /* ---------- Maxes form ---------- */
+  $("fields").innerHTML = FIELDS.map(function (f) {
+    return '<label class="field">' + esc(f.label) + '<input id="m-' + f.k + '" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg" autocomplete="off"></label>';
+  }).join("");
+
+  function syncMaxes() {
+    FIELDS.forEach(function (f) { maxes[f.k] = num($("m-" + f.k).value); });
+  }
+
+  /* ---------- Max estimator ---------- */
+  var ELIFTS = [["bench", "Bench press"], ["squat", "Squat"], ["deadlift", "Deadlift"], ["ohp", "Overhead press"],
+                ["pullup", "Pull-up (added weight)"], ["dip", "Dip (added weight)"]];
+  $("e-lift").innerHTML = ELIFTS.map(function (l) { return '<option value="' + l[0] + '">' + esc(l[1]) + '</option>'; }).join("");
+
+  function updateEstimator() {
+    var lift = $("e-lift").value;
+    var added = lift === "pullup" || lift === "dip";
+    $("e-wl").textContent = added ? "Added weight (kg)" : "Weight (kg)";
+    var w = num($("e-w").value), r = num($("e-r").value), out = $("e-out");
+    if (w == null || r == null || r < 1) { out.textContent = "Enter the weight and reps of a recent hard set, ideally 10 reps or fewer."; return; }
+    var est;
+    if (added) {
+      if (maxes.bw == null) { out.textContent = "Enter your bodyweight above first."; return; }
+      est = r === 1 ? w : (maxes.bw + w) * (1 + r / 30) - maxes.bw;
+    } else {
+      est = r === 1 ? w : w * (1 + r / 30);
+    }
+    est = Math.round(est * 2) / 2;
+    out.textContent = "Estimated max: " + fmt(est) + " kg. Type it into the matching field above." +
+      (r > 12 ? " Accuracy drops beyond about 12 reps." : "");
+  }
+
+  /* ---------- Week of plates ---------- */
+  function renderStrip() {
+    var today = todayIndex();
+    strip.innerHTML = DAYS.map(function (d, i) {
+      var cls = "day-btn" + (d.rest ? " is-rest" : "") + (i === today ? " is-today" : "");
+      var label = "Day " + d.n + ", " + d.full + ", " + d.name + (i === today ? ", today" : "");
+      return '<button type="button" class="' + cls + '" data-i="' + i + '" aria-pressed="' + (i === state.sel) +
+        '" aria-label="' + esc(label) + '">' +
+        '<span class="plate" style="--c:var(--' + (d.color || "rest") + ')"><span class="hole">' + d.n + '</span></span>' +
+        '<span class="wd">' + d.wd + '</span><span class="nm">' + d.label + '</span></button>';
+    }).join("");
+  }
+
+  /* ---------- Day card ---------- */
+  function renderDay() {
+    var d = DAYS[state.sel];
+    detail.style.setProperty("--accent", "var(--" + (d.color || "rest") + ")");
+    var head = '<div class="head"><p class="kicker">Day ' + d.n + ', ' + d.full + '</p><h2>' + esc(d.name) + '</h2>' +
+      '<p class="focus">' + esc(d.focus) + '</p>';
+    if (d.rest) {
+      detail.innerHTML = head + '</div><ul class="rest-list">' +
+        d.tips.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
+      return;
+    }
+    head += '<p class="facts">' + d.ex.length + ' exercises, ' + setsOf(d) + ' sets, about ' + d.min + ' min</p></div>';
+    detail.innerHTML = head + d.ex.map(function (e) {
+      return '<article class="ex"><div class="ex-main"><h3>' + esc(e.name) + '</h3>' +
+        '<span class="scheme">' + e.sets + ' sets × ' + e.reps + ' reps</span>' +
+        '<div class="meta"><span>Rest ' + e.rest + '</span><span>' + effort(e) + '</span>' +
+        (e.target ? '<span class="tag">Target lift</span>' : '') + '</div></div>' +
+        weightBlock(e) + '<p class="note">' + esc(e.note) + '</p></article>';
+    }).join("");
+  }
+
+  /* ---------- Volume ---------- */
+  function renderVolume() {
+    var tot = {};
+    DAYS.forEach(function (d) {
+      if (d.rest) return;
+      d.ex.forEach(function (e) {
+        Object.keys(e.m).forEach(function (k) { tot[k] = (tot[k] || 0) + e.sets * e.m[k]; });
+      });
+    });
+    var MAX = 24;
+    $("vol").innerHTML = MUSCLES.map(function (m) {
+      var v = Math.round(tot[m[0]] || 0);
+      return '<div class="vrow"><span>' + esc(m[1]) + '</span><div class="track" role="img" aria-label="' + esc(m[1]) + ': ' + v + ' sets per week">' +
+        '<div class="band" style="left:' + (10 / MAX * 100) + '%;width:' + (10 / MAX * 100) + '%"></div>' +
+        '<div class="fill" style="width:' + Math.min(100, v / MAX * 100) + '%"></div></div><span>' + v + '</span></div>';
+    }).join("");
+  }
+
+  /* ---------- Events ---------- */
+  strip.addEventListener("click", function (ev) {
+    var b = ev.target.closest(".day-btn");
+    if (!b) return;
+    state.sel = Number(b.getAttribute("data-i"));
+    renderStrip();
+    renderDay();
+  });
+  $("fields").addEventListener("input", function () {
+    syncMaxes();
+    renderDay();
+    updateEstimator();
+  });
+  ["e-lift", "e-w", "e-r"].forEach(function (id) {
+    $(id).addEventListener("input", updateEstimator);
+    $(id).addEventListener("change", updateEstimator);
+  });
+
+  syncMaxes();
+  renderStrip();
+  renderDay();
+  renderVolume();
+  updateEstimator();
+})();
+</script>
+</body>
+</html>
