@@ -42,12 +42,12 @@
   :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
   h1, h2, h3 { margin: 0; font-stretch: 62%; font-weight: 800; line-height: 1; }
-  h1 { font-size: clamp(2.7rem, 12vw, 4.8rem); letter-spacing: .01em; word-spacing: .08em; text-transform: uppercase; }
-  .lede { max-width: 56ch; margin: 18px 0 0; color: var(--soft); font-size: 1.05rem; }
+  h1 { font-size: clamp(1.8rem, 7.2vw, 2.7rem); letter-spacing: .01em; word-spacing: .08em; text-transform: uppercase; }
+  .lede { max-width: 56ch; margin: 10px 0 0; color: var(--soft); font-size: .95rem; }
 
   /* top bar */
   .topbar {
-    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-bottom: 30px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; margin-bottom: 18px;
     font: 600 .72rem/1.4 var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
   }
   .brand { color: var(--ink); }
@@ -55,7 +55,8 @@
 
   /* panels, in the spirit of a control-center dashboard */
   .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 14px 18px; }
-  section.panel { margin-top: 28px; }
+  .panel { margin-top: 20px; }
+  details.panel:not([open]) { padding-bottom: 14px; }
   .panel-title {
     display: flex; align-items: center; gap: 12px; margin: 0; padding: 11px 14px;
     background: var(--inset); border-radius: 8px;
@@ -66,7 +67,7 @@
 
   /* maxes */
   .maxes:focus-within { border-color: var(--red); box-shadow: 0 0 0 1px var(--red), 0 0 26px var(--glow); }
-  .fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 12px; margin: 16px 4px 4px; }
+  .fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 10px; margin: 14px 4px 4px; }
   .field {
     display: grid; gap: 6px; align-content: end;
     font: 600 .68rem/1.25 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
@@ -79,15 +80,29 @@
   .maxes input::placeholder { color: #6B6B74; font-weight: 400; }
   .maxes input:focus, .maxes select:focus { border-color: var(--red); outline: none; }
   .maxes select { padding-right: 6px; }
-  details { margin: 16px 4px 0; }
-  summary { cursor: pointer; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
-  summary::marker { color: var(--red); }
+  .reset {
+    margin: 4px 4px 0; padding: 8px 0; background: none; border: 0; cursor: pointer;
+    color: var(--muted); font: 600 .7rem/1 var(--mono); letter-spacing: .14em; text-transform: uppercase;
+    text-decoration: underline; text-underline-offset: 4px;
+  }
+  .reset:hover { color: var(--ink); }
+  summary { cursor: pointer; }
+  details.estimator { margin: 14px 4px 0; }
+  .estimator > summary { font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+  .estimator > summary::marker { color: var(--red); }
+  summary.panel-title { list-style: none; }
+  summary.panel-title::-webkit-details-marker { display: none; }
+  summary.panel-title > span:first-child { margin-right: auto; }
+  details[open] > summary.panel-title::before { content: "\25BE"; }
+  .edit { font-weight: 400; font-size: .64rem; letter-spacing: .14em; color: var(--muted); }
+  .edit::after { content: attr(data-closed); }
+  details[open] > summary .edit::after { content: attr(data-open); }
   .est-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
   .est-row .wide { grid-column: 1 / -1; }
   .maxes .est-out { margin: 12px 0 0; font: 600 .9rem var(--mono); color: var(--ink); }
 
   /* week of plates */
-  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 40px 0 10px; }
+  .strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 24px 0 6px; }
   .day-btn {
     display: flex; flex-direction: column; align-items: center; gap: 5px;
     padding: 6px 0 2px; background: none; border: 0; border-radius: 14px;
@@ -117,15 +132,15 @@
     content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
     background: var(--red); margin-left: 4px; vertical-align: middle;
   }
-  .hint { margin: 14px 0 0; color: var(--muted); font-size: .92rem; max-width: 60ch; }
+  .hint { margin: 8px 0 0; color: var(--muted); font-size: .85rem; max-width: 60ch; }
 
   /* day card: red contour, bold coloured header */
   .day {
-    margin-top: 24px; background: var(--surface); border: 1.5px solid var(--red); border-radius: 18px;
+    margin-top: 16px; background: var(--surface); border: 1.5px solid var(--red); border-radius: 18px;
     box-shadow: 0 0 0 1px rgba(229, 56, 59, .22), 0 0 34px var(--glow); overflow: hidden;
   }
   .dhead {
-    position: relative; overflow: hidden; padding: 20px 20px 24px;
+    position: relative; overflow: hidden; padding: 16px 20px 18px;
     background: var(--accent); color: var(--on-accent);
   }
   .dhead::after {
@@ -137,19 +152,20 @@
   .dhead > * { position: relative; z-index: 1; }
   .dtop { display: flex; flex-wrap: wrap; gap: 4px 16px; font: 700 .78rem/1 var(--mono); letter-spacing: .2em; text-transform: uppercase; }
   .dname {
-    margin: 16px 0 0; max-width: 11ch; text-wrap: balance;
-    font-size: clamp(3.6rem, 18vw, 6.5rem); font-weight: 900; line-height: .86; letter-spacing: .01em; word-spacing: .06em; text-transform: uppercase;
+    margin: 10px 0 0; max-width: 11ch; text-wrap: balance;
+    font-size: clamp(3.2rem, 15vw, 5.5rem); font-weight: 900; line-height: .86; letter-spacing: .01em; word-spacing: .06em; text-transform: uppercase;
   }
-  .dfacts { margin: 16px 0 0; font: 600 .8rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+  .dfacts { margin: 10px 0 0; font: 600 .8rem/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
   .focus { margin: 0; padding: 16px 20px; color: var(--soft); max-width: 62ch; }
 
   .ex {
-    display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: start;
-    padding: 18px 20px; border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; align-items: start;
+    padding: 14px 20px; border-top: 1px solid var(--line);
   }
-  .ex-main { min-width: 0; display: grid; gap: 7px; }
-  .ex h3 { font-stretch: 75%; font-size: 1.45rem; font-weight: 750; line-height: 1.1; }
-  .role { margin-top: -3px; font: 400 .68rem/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .ex-main { min-width: 0; display: grid; gap: 5px; }
+  .ex h3 { font-stretch: 75%; font-size: 1.35rem; font-weight: 750; line-height: 1.1; }
+  .tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+  .role { font: 400 .66rem/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
   .scheme { font: 700 .82rem/1.2 var(--mono); letter-spacing: .04em; }
   .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 12px; color: var(--muted); font: 400 .74rem/1.3 var(--mono); letter-spacing: .03em; }
   .tag {
@@ -157,18 +173,15 @@
     padding: 4px 8px; border-radius: 999px; border: 1px solid var(--accent);
   }
   .wt { text-align: right; }
-  .wt strong { display: block; font-stretch: 62%; font-weight: 900; font-size: 2.7rem; line-height: .95; }
+  .wt strong { display: block; font-stretch: 62%; font-weight: 900; font-size: 2.3rem; line-height: .95; }
   .wt span { display: block; margin: 4px 0 0 auto; max-width: 9.5rem; font: 400 .66rem/1.3 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
   .wt.txt strong { font-stretch: 75%; font-size: 1.3rem; padding-top: 6px; }
   .wt.pending strong { color: var(--line-strong); }
-  .note { grid-column: 1 / -1; margin: 4px 0 0; color: var(--muted); font-size: .95rem; max-width: 60ch; }
+  .note { grid-column: 1 / -1; margin: 2px 0 0; color: var(--muted); font-size: .88rem; max-width: 60ch; }
 
   .rest-list { margin: 0; padding: 4px 20px 24px 40px; display: grid; gap: 10px; max-width: 64ch; color: var(--soft); border-top: 1px solid var(--line); padding-top: 18px; }
 
   /* sections below */
-  .rules { list-style: none; margin: 16px 4px 4px; padding: 0; display: grid; gap: 14px; max-width: 64ch; color: var(--soft); }
-  .rules strong { font-weight: 750; color: var(--ink); }
-
   .vrow { display: grid; grid-template-columns: 8.5rem 1fr 2rem; align-items: center; gap: 10px; padding: 5px 0; }
   .vrow span:first-child { font: 600 .72rem/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
   .vrow span:last-child { text-align: right; font: 700 .85rem var(--mono); }
@@ -196,15 +209,15 @@
   <header>
     <div class="topbar"><span class="brand"><b>&#9672;</b>4-day split</span><span id="today"></span></div>
     <h1>4 days a week. Muscle first, strength second.</h1>
-    <p class="lede">Pull and push back to back on the weekend, legs on Tuesday, arms and shoulders on Thursday. The heavy lifts get 3 to 4 sets stopped short of failure. Everything else gets 2 sets taken to failure. Enter your maxes and every weight is worked out for you.</p>
+    <p class="lede">Heavy lifts: 3 to 4 sets, stopped short of failure. Everything else: 2 sets to failure.</p>
   </header>
 
-  <section class="maxes panel" aria-labelledby="max-h">
-    <h2 class="panel-title" id="max-h">Your maxes</h2>
-    <p>The most you can lift for 1 rep, in kg. For pull-ups and dips, enter the extra weight you can add for 1 rep; use 0 if you can only do bodyweight. Target weights below update as you type.</p>
+  <details class="maxes panel">
+    <summary class="panel-title"><span>Your maxes</span><span class="edit" data-closed="Tap to edit" data-open="Close"></span></summary>
+    <p>1-rep maxes in kg. For pull-up and dip, enter the added weight. A ~ before a weight marks an estimate.</p>
     <div class="fields" id="fields"></div>
-    <p>Bench, squat, deadlift, overhead press, pull-ups and dips come straight from your max. Every other exercise is an estimate from typical strength ratios and is marked as one. Treat those as a first guess and adjust after your first session.</p>
-    <details>
+    <button class="reset" id="reset-maxes" type="button">Reset to preset</button>
+    <details class="estimator">
       <summary>Don't know your max? Estimate it from a hard set</summary>
       <div class="est-row">
         <label class="field wide">Lift <select id="e-lift" autocomplete="off"></select></label>
@@ -213,33 +226,21 @@
       </div>
       <p class="est-out" id="e-out" aria-live="polite"></p>
     </details>
-  </section>
+  </details>
 
   <nav class="strip" id="strip" aria-label="Weekly schedule"></nav>
-  <p class="hint">The week starts on Saturday so the two back-to-back days land on the weekend. Tap a plate to open that day. The dot marks today.</p>
+  <p class="hint">Tap a plate to open a day. The red dot marks today.</p>
 
   <section class="day" id="detail"></section>
 
-  <section class="plain panel" aria-labelledby="prog-h">
-    <h2 class="panel-title" id="prog-h">How to train it</h2>
-    <ul class="rules">
-      <li><strong>Reading the weights.</strong> Each target is the load for the bottom of the rep range at the effort shown. Start there and add reps each week.</li>
-      <li><strong>Moving up.</strong> When every set reaches the top of the rep range, raise that lift's max above (bench and overhead press +2.5 kg, squat and deadlift +5 kg, pull-ups and dips +1 to 2.5 kg) and the targets follow.</li>
-      <li><strong>Heavy lifts.</strong> 3 to 4 sets at the same weight, stopping with 1 or 2 reps left. Not to failure.</li>
-      <li><strong>Everything else.</strong> 2 working sets, both taken to failure: the last rep you can do with clean form, not a grinder. Squat, bench and overhead press always get safeties or a spotter.</li>
-      <li><strong>Warm-up.</strong> Before the first lift of each day, do 3 lighter ramp-up sets. Before each other exercise, 1 light set. None of these count as working sets.</li>
-      <li><strong>Deload.</strong> Every 6 to 8 weeks, or when your reps drop two weeks in a row: half the sets, weights about 10% lighter, for one week.</li>
-    </ul>
-  </section>
-
-  <section class="plain panel" aria-labelledby="vol-h">
-    <h2 class="panel-title" id="vol-h">Weekly sets per muscle</h2>
-    <p class="sub">Sets from compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual range for growth; sets taken to failure let you sit near the low end. Rear delts and abs sit below it, and calves get no direct work, so add sets there if they are a weak point.</p>
+  <details class="panel">
+    <summary class="panel-title"><span>Weekly sets per muscle</span><span class="edit" data-closed="Tap to open" data-open="Close"></span></summary>
+    <p class="sub">Sets from compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual range for growth; sets taken to failure let you sit near the low end. Rear delts and abs sit below it, and calves get no direct work.</p>
     <div class="vol" id="vol"></div>
-  </section>
+  </details>
 
   <footer>
-    <p>Nothing is saved. Your maxes are cleared when you reload the page.</p>
+    <p>Nothing is saved. Reloading the page restores your preset maxes.</p>
   </footer>
 </div>
 
@@ -407,12 +408,12 @@
 
   var FIELDS = [
     { k: "bw", label: "Bodyweight" },
-    { k: "bench", label: "Bench press" },
+    { k: "bench", label: "Bench" },
     { k: "squat", label: "Squat" },
     { k: "deadlift", label: "Deadlift" },
-    { k: "ohp", label: "Overhead press" },
-    { k: "pullup", label: "Pull-up, added weight" },
-    { k: "dip", label: "Dip, added weight" }
+    { k: "ohp", label: "Overhead" },
+    { k: "pullup", label: "Pull-up +" },
+    { k: "dip", label: "Dip +" }
   ];
   var HINT = {
     bench: "add your bench max", squat: "add your squat max", deadlift: "add your deadlift max",
@@ -435,8 +436,8 @@
   function firstTrainingFrom(i) { while (DAYS[i].rest) i = (i + 1) % 7; return i; }
   function setsOf(d) { return d.ex.reduce(function (a, e) { return a + e.sets; }, 0); }
   function effort(e) {
-    if (e.rir === 0) return "Go to failure";
-    return "Stop with " + e.rir + (e.rir === 1 ? " rep" : " reps") + " left";
+    if (e.rir === 0) return "To failure";
+    return e.rir + (e.rir === 1 ? " rep" : " reps") + " left";
   }
 
   /* Target weight: Epley formula, load = max / (1 + reps_to_failure / 30),
@@ -450,13 +451,13 @@
     var base = added ? maxes.bw + m : m;
     var n = parseInt(e.reps, 10) + e.rir;
     var load = e.ratio * base / (1 + n / 30);
-    var est = e.est ? ", estimate" : "";
+    var est = e.est ? "~" : "";
     if (added) {
       load -= maxes.bw;
-      if (load < 0.625) return { text: "Bodyweight", sub: "no added weight yet" + est };
-      return { value: "+" + fmt(roundTo(load, 1.25)), unit: "kg added" + est };
+      if (load < 0.625) return { text: "Bodyweight", sub: "no added weight yet" };
+      return { value: est + "+" + fmt(roundTo(load, 1.25)), unit: "kg added" };
     }
-    return { value: fmt(Math.max(e.step, roundTo(load, e.step))), unit: e.unit + est };
+    return { value: est + fmt(Math.max(e.step, roundTo(load, e.step))), unit: e.unit };
   }
 
   function weightBlock(e) {
@@ -474,6 +475,12 @@
   $("fields").innerHTML = FIELDS.map(function (f) {
     return '<label class="field">' + esc(f.label) + '<input id="m-' + f.k + '" type="number" inputmode="decimal" min="0" step="0.5" placeholder="kg" autocomplete="off"></label>';
   }).join("");
+
+  /* Default values loaded on every visit. Edit here to change your preset. */
+  var PRESET = { bw: 85, bench: 130, squat: 150, dip: 50, pullup: 30, ohp: 80, deadlift: 190 };
+  function applyPreset() {
+    FIELDS.forEach(function (f) { $("m-" + f.k).value = PRESET[f.k]; });
+  }
 
   function syncMaxes() {
     FIELDS.forEach(function (f) { maxes[f.k] = num($("m-" + f.k).value); });
@@ -523,7 +530,7 @@
     var head = '<header class="dhead"><div class="dtop"><span>Day ' + d.n + '</span><span>' + d.full + '</span></div>' +
       '<h2 class="dname">' + esc(d.name) + '</h2>' +
       (d.rest ? '' : '<p class="dfacts">' + d.ex.length + ' exercises, ' + setsOf(d) + ' sets, about ' + d.min + ' min</p>') +
-      '</header><p class="focus">' + esc(d.focus) + '</p>';
+      '</header>' + (d.rest ? '<p class="focus">' + esc(d.focus) + '</p>' : '');
     if (d.rest) {
       detail.innerHTML = head + '<ul class="rest-list">' +
         d.tips.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ul>";
@@ -532,11 +539,13 @@
     detail.innerHTML = head + d.ex.map(function (e) {
       var mt = /^(.*?)\s*\((.*)\)$/.exec(e.name);
       var title = mt ? mt[1] : e.name;
-      return '<article class="ex"><div class="ex-main"><h3>' + esc(title) + '</h3>' +
-        (mt ? '<span class="role">' + esc(mt[2]) + '</span>' : '') +
+      var tags = (mt || e.target)
+        ? '<div class="tags">' + (mt ? '<span class="role">' + esc(mt[2]) + '</span>' : '') +
+          (e.target ? '<span class="tag">Target lift</span>' : '') + '</div>'
+        : '';
+      return '<article class="ex"><div class="ex-main"><h3>' + esc(title) + '</h3>' + tags +
         '<span class="scheme">' + e.sets + ' sets × ' + e.reps + ' reps</span>' +
-        '<div class="meta"><span>Rest ' + e.rest + '</span><span>' + effort(e) + '</span>' +
-        (e.target ? '<span class="tag">Target lift</span>' : '') + '</div></div>' +
+        '<div class="meta"><span>Rest ' + e.rest + '</span><span>' + effort(e) + '</span></div></div>' +
         weightBlock(e) + '<p class="note">' + esc(e.note) + '</p></article>';
     }).join("");
   }
@@ -573,6 +582,12 @@
     renderStrip();
     renderDay();
   });
+  $("reset-maxes").addEventListener("click", function () {
+    applyPreset();
+    syncMaxes();
+    renderDay();
+    updateEstimator();
+  });
   $("fields").addEventListener("input", function () {
     syncMaxes();
     renderDay();
@@ -583,6 +598,7 @@
     $(id).addEventListener("change", updateEstimator);
   });
 
+  applyPreset();
   syncMaxes();
   renderToday();
   renderStrip();
