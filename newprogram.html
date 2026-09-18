@@ -43,7 +43,9 @@
   .side { display: contents; }
   .main { order: 1; min-width: 0; }
   .maxes { order: 2; }
-  .sets { order: 3; }
+  .stats { order: 3; }
+  .sets { order: 4; }
+  .bal { order: 5; }
   :focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
 
   h1, h2, h3 { margin: 0; font-stretch: 62%; font-weight: 800; line-height: 1; }
@@ -124,6 +126,68 @@
   .day-btn.is-rest .hole { background: transparent; color: var(--muted); }
   .day-btn[aria-pressed="true"] .plate { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink); }
 
+
+  /* strength stats */
+  .stats, .bal { container-type: inline-size; }
+  .tot { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 4px 0; }
+  .tot > div { background: var(--inset); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+  .tot .k { display: block; font: 600 .62rem/1.3 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .tot strong { display: block; margin-top: 8px; font-stretch: 62%; font-weight: 900; font-size: 2.4rem; line-height: 1; }
+  .tot small { margin-left: 5px; font: 600 .72rem var(--mono); letter-spacing: .06em; color: var(--muted); }
+  .lifts { margin: 14px 4px 0; }
+  .lrow {
+    display: grid; grid-template-columns: 1fr auto auto; grid-template-areas: "n v r" "m m l";
+    gap: 6px 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line);
+  }
+  .ln { grid-area: n; font: 700 .74rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .lv { grid-area: v; font: 700 .85rem var(--mono); text-align: right; }
+  .lr { grid-area: r; font: 400 .8rem var(--mono); color: var(--muted); text-align: right; min-width: 3.4rem; }
+  .meter { grid-area: m; display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+  .meter i { height: 8px; border-radius: 2px; background: var(--line-strong); }
+  .meter i.on { background: var(--red); }
+  .ll { grid-area: l; font: 600 .68rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--soft); text-align: right; }
+  @container (min-width: 500px) {
+    .lrow { grid-template-columns: 7.2rem 4.6rem 3.8rem 1fr 6.8rem; grid-template-areas: "n v r m l"; }
+  }
+
+  /* balance */
+  .balbody { display: grid; gap: 14px; margin-top: 6px; }
+  .radar svg { display: block; width: 100%; max-width: 440px; margin: 0 auto; overflow: visible; }
+  .rg { fill: none; stroke: var(--line-strong); stroke-width: 1; }
+  .rb { fill: rgba(255, 255, 255, .06); fill-rule: evenodd; stroke: none; }
+  .ra { stroke: var(--line); stroke-width: 1; }
+  .rd { fill: rgba(229, 56, 59, .3); stroke: var(--red); stroke-width: 2; stroke-linejoin: round; }
+  .rp { fill: var(--red); }
+  .rl { font: 600 10.5px var(--mono); letter-spacing: .06em; fill: var(--soft); }
+  .rl .rv { fill: var(--ink); font-weight: 700; }
+  .ratios { display: grid; gap: 18px; align-content: center; margin: 4px 4px 0; }
+  .split .sl { display: flex; justify-content: space-between; gap: 10px; font: 600 .7rem/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+  .split .sl b { font-weight: 700; }
+  .split i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin: 0 6px; }
+  .split .d1 { background: var(--ink); margin-left: 0; }
+  .split .d2 { background: var(--red); margin-right: 0; }
+  .sbar { display: flex; height: 12px; margin-top: 8px; border-radius: 6px; overflow: hidden; gap: 2px; }
+  .sbar span:first-child { background: var(--ink); }
+  .sbar span:last-child { background: var(--red); flex: 1; }
+  .split .sn { margin: 8px 0 0; font-size: .86rem; color: var(--muted); }
+  @container (min-width: 520px) { .balbody { grid-template-columns: 1.6fr 1fr; align-items: center; } }
+
+  /* body map inside the day header */
+  .dhead > .bm { position: absolute; right: 44px; top: 50%; transform: translateY(-50%); display: none; gap: 18px; z-index: 1; }
+  .bm svg { display: block; height: 152px; width: auto; }
+  .bm .hd { fill: var(--on-accent); fill-opacity: .16; }
+  .bm .sil { fill: none; stroke: var(--on-accent); stroke-opacity: .5; stroke-width: 1.1; }
+  .bm .mus { fill: var(--on-accent); fill-opacity: .14; }
+  .bm .mus.on { fill-opacity: var(--o, 1); }
+  .bm text { fill: var(--on-accent); fill-opacity: .75; font: 700 7px var(--mono); letter-spacing: .14em; text-anchor: middle; }
+  @keyframes light { from { fill-opacity: .14; } }
+  .day.anim .bm .mus.on { animation: light .7s .3s ease-out both; }
+  @media (min-width: 700px) {
+    .dhead > .bm { display: flex; }
+    .dhead:has(.bm) { min-height: 178px; }
+    .dhead:has(.bm)::after { display: none; }
+  }
+
   /* motion: the chosen plate rolls, the day card rises in */
   @keyframes roll { from { transform: rotate(-360deg); } to { transform: rotate(0); } }
   @keyframes pop { 0% { transform: scale(.86); } 55% { transform: scale(1.08); } 100% { transform: scale(1); } }
@@ -135,7 +199,7 @@
   .day.anim .ex { animation: rise .4s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 45ms + 90ms); }
   @media (prefers-reduced-motion: reduce) {
     .day-btn .plate, .day-btn .plate::before, .day.anim .dhead, .day.anim .focus,
-    .day.anim .rest-list, .day.anim .ex { animation: none !important; }
+    .day.anim .rest-list, .day.anim .ex, .day.anim .bm .mus.on { animation: none !important; }
   }
   .wd { font: 700 .72rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
   .nm { font: 400 .66rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -259,10 +323,23 @@
         </div>
       </section>
 
+      <section class="stats panel" aria-labelledby="st-h">
+        <h2 class="panel-title" id="st-h">Strength stats</h2>
+        <div id="stats"></div>
+      </section>
+
       <section class="sets panel" aria-labelledby="vol-h">
         <h2 class="panel-title" id="vol-h">Weekly sets per muscle</h2>
         <p class="sub">Compound lifts count half for supporting muscles. The shaded band marks 10 to 20 sets, the usual growth range. Rear delts and abs sit below it, and calves get no direct work.</p>
         <div class="vol" id="vol"></div>
+      </section>
+
+      <section class="bal panel" aria-labelledby="bal-h">
+        <h2 class="panel-title" id="bal-h">Balance</h2>
+        <div class="balbody">
+          <div class="radar" id="radar"></div>
+          <div class="ratios" id="ratios"></div>
+        </div>
       </section>
     </aside>
 
@@ -564,7 +641,7 @@
     detail.style.setProperty("--on-accent", d.color === "yellow" ? "#111" : "#fff");
     var head = '<header class="dhead"><div class="dtop"><span>Day ' + d.n + '</span><span>' + d.full + '</span></div>' +
       '<h2 class="dname">' + esc(d.name) + '</h2>' +
-      (d.rest ? '' : '<p class="dfacts">' + d.ex.length + ' exercises, ' + setsOf(d) + ' sets, about ' + d.min + ' min</p>') +
+      (d.rest ? '' : '<p class="dfacts">' + d.ex.length + ' exercises, ' + setsOf(d) + ' sets, about ' + d.min + ' min</p>' + bodyMap(d)) +
       '</header>' + (d.rest ? '<p class="focus">' + esc(d.focus) + '</p>' : '');
     if (d.rest) {
       detail.innerHTML = head + '<ul class="rest-list">' +
@@ -598,7 +675,7 @@
   }
 
   /* ---------- Volume ---------- */
-  function renderVolume() {
+  function weeklyTotals() {
     var tot = {};
     DAYS.forEach(function (d) {
       if (d.rest) return;
@@ -606,6 +683,138 @@
         Object.keys(e.m).forEach(function (k) { tot[k] = (tot[k] || 0) + e.sets * e.m[k]; });
       });
     });
+    return tot;
+  }
+  function dayLoad(d) {
+    var tot = {};
+    d.ex.forEach(function (e) {
+      Object.keys(e.m).forEach(function (k) { tot[k] = (tot[k] || 0) + e.sets * e.m[k]; });
+    });
+    return tot;
+  }
+
+  /* ---------- Body map ---------- */
+  var BM = {
+    sil: '<ellipse class="hd" cx="50" cy="15" rx="9" ry="11"/>' +
+      '<path class="sil" d="M45 26V33M55 26V33"/>' +
+      '<path class="sil" d="M45 33C38 35 30 37 27 42C25 50 27 66 32 84C34 92 35 100 34 108H66C65 100 66 92 68 84C73 66 75 50 73 42C70 37 62 35 55 33"/>',
+    limbs: '<ellipse class="sil" cx="22.5" cy="61" rx="6" ry="17"/><ellipse class="sil" cx="19.5" cy="92" rx="4.6" ry="15"/>' +
+      '<ellipse class="sil" cx="41" cy="132" rx="10" ry="27"/><ellipse class="sil" cx="40" cy="184" rx="6.5" ry="25"/>' +
+      '<ellipse class="sil" cx="39" cy="212" rx="7" ry="3"/>',
+    front: [
+      ["delts", '<ellipse cx="25" cy="44" rx="7.5" ry="8.5"/>', true],
+      ["chest", '<path d="M49.5 42C44 40 35 41 31 46C30 53 34 60 42 62C46 62.5 49.5 61 49.5 58Z"/>', true],
+      ["biceps", '<ellipse cx="23.5" cy="62" rx="4.8" ry="10.5"/>', true],
+      ["quads", '<ellipse cx="41" cy="130" rx="9" ry="23"/>', true],
+      ["abs", '<rect x="43.3" y="66" width="6.2" height="10" rx="2.5"/><rect x="50.5" y="66" width="6.2" height="10" rx="2.5"/>' +
+        '<rect x="43.3" y="77.5" width="6.2" height="10" rx="2.5"/><rect x="50.5" y="77.5" width="6.2" height="10" rx="2.5"/>' +
+        '<rect x="43.3" y="89" width="6.2" height="10" rx="2.5"/><rect x="50.5" y="89" width="6.2" height="10" rx="2.5"/>', false]
+    ],
+    back: [
+      ["back", '<path d="M50 33L37 38C32 41 29 46 29 52C30 66 36 84 43 102L50 104Z"/>', true],
+      ["rear", '<ellipse cx="25" cy="44" rx="7.5" ry="8.5"/>', true],
+      ["triceps", '<ellipse cx="22.5" cy="62" rx="5.2" ry="11"/>', true],
+      ["hams", '<ellipse cx="41.5" cy="113" rx="9.5" ry="8"/><ellipse cx="41" cy="142" rx="8.5" ry="19"/>', true],
+      ["calves", '<ellipse cx="40" cy="181" rx="6" ry="15"/>', true]
+    ]
+  };
+  function sym(s) { return "<g>" + s + '</g><g transform="translate(100 0) scale(-1 1)">' + s + "</g>"; }
+  function figure(list, load, label) {
+    var body = sym(BM.limbs) + BM.sil;
+    list.forEach(function (m) {
+      var v = load[m[0]] || 0;
+      var o = Math.max(0.35, Math.min(1, 0.35 + v / 8 * 0.65));
+      body += '<g class="mus' + (v >= 1 ? " on" : "") + '" style="--o:' + o.toFixed(2) + '">' + (m[2] ? sym(m[1]) : m[1]) + "</g>";
+    });
+    return '<svg viewBox="0 0 100 236" aria-hidden="true">' + body + '<text x="50" y="231">' + label + "</text></svg>";
+  }
+  function bodyMap(d) {
+    var load = dayLoad(d), names = [];
+    MUSCLES.forEach(function (m) { if ((load[m[0]] || 0) >= 1) names.push(m[1].toLowerCase()); });
+    return '<div class="bm" role="img" aria-label="Muscles trained: ' + esc(names.join(", ")) + '">' +
+      figure(BM.front, load, "FRONT") + figure(BM.back, load, "BACK") + "</div>";
+  }
+
+  /* ---------- Strength stats ---------- */
+  var STD = {
+    squat: [0.75, 1.25, 1.5, 2.25, 2.75], bench: [0.5, 0.75, 1.25, 1.75, 2], deadlift: [1, 1.5, 2, 2.5, 3],
+    ohp: [0.35, 0.55, 0.8, 1.05, 1.4], pullup: [0, 0.1, 0.25, 0.45, 0.65], dip: [0, 0.15, 0.4, 0.7, 1]
+  };
+  var LEVELS = ["Beginner", "Novice", "Intermediate", "Advanced", "Elite"];
+  var SROWS = [["squat", "Squat", false], ["bench", "Bench", false], ["deadlift", "Deadlift", false],
+               ["ohp", "Overhead press", false], ["pullup", "Pull-up", true], ["dip", "Dip", true]];
+  function renderStats() {
+    var bw = maxes.bw > 0 ? maxes.bw : null;
+    var big = ["squat", "bench", "deadlift"];
+    var have = big.every(function (k) { return maxes[k] != null; });
+    var total = have ? big.reduce(function (a, k) { return a + maxes[k]; }, 0) : null;
+    var html = '<div class="tot"><div><span class="k">Total: squat + bench + deadlift</span><strong>' +
+      (total == null ? "–" : fmt(total) + "<small>kg</small>") + '</strong></div>' +
+      '<div><span class="k">Total per kg bodyweight</span><strong>' +
+      (total != null && bw ? (total / bw).toFixed(1) + "<small>×</small>" : "–") + '</strong></div></div><div class="lifts">';
+    SROWS.forEach(function (r) {
+      var m = maxes[r[0]], ratio = (m != null && bw) ? m / bw : null, lvl = 0;
+      if (ratio != null) lvl = STD[r[0]].filter(function (t) { return ratio >= t; }).length;
+      var cells = "";
+      for (var i = 0; i < 5; i++) cells += '<i' + (i < lvl ? ' class="on"' : "") + "></i>";
+      html += '<div class="lrow"><span class="ln">' + r[1] + '</span>' +
+        '<span class="lv">' + (m == null ? "–" : (r[2] ? "+" : "") + fmt(m) + " kg") + '</span>' +
+        '<span class="lr">' + (ratio == null ? "" : ratio.toFixed(2) + "×") + '</span>' +
+        '<span class="meter" aria-hidden="true">' + cells + '</span>' +
+        '<span class="ll">' + (ratio == null ? (m == null ? "" : "add bodyweight") : (lvl === 0 ? "Untrained" : LEVELS[lvl - 1])) + '</span></div>';
+    });
+    html += '</div><p class="sub">Levels compare each lift with rough male strength standards for your bodyweight, from beginner to elite. Pull-up and dip use the added weight. A guide, not a verdict.</p>';
+    $("stats").innerHTML = html;
+  }
+
+  /* ---------- Balance ---------- */
+  var AXES = [["chest", "Chest"], ["delts", "Delts"], ["triceps", "Triceps"], ["abs", "Abs"], ["quads", "Quads"],
+              ["hams", "Hams"], ["back", "Back"], ["rear", "Rear delts"], ["biceps", "Biceps"]];
+  function renderBalance() {
+    var tot = weeklyTotals();
+    var cx = 180, cy = 160, R = 104, MAXV = 24, n = AXES.length;
+    function pt(i, v) {
+      var a = (-90 + i * 360 / n) * Math.PI / 180, r = R * Math.min(v, MAXV) / MAXV;
+      return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+    }
+    function pts(v) { return AXES.map(function (_, i) { return pt(i, v).map(function (x) { return x.toFixed(1); }).join(","); }); }
+    var svg = '<svg viewBox="-28 8 416 304" role="img" aria-label="Radar chart of weekly sets per muscle">';
+    svg += '<path class="rb" d="M' + pts(20).join("L") + 'ZM' + pts(10).join("L") + 'Z"/>';
+    [10, 20, 24].forEach(function (v) { svg += '<polygon class="rg" points="' + pts(v).join(" ") + '"/>'; });
+    AXES.forEach(function (_, i) { var p = pt(i, MAXV); svg += '<line class="ra" x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '"/>'; });
+    var vals = AXES.map(function (a) { return Math.round(tot[a[0]] || 0); });
+    svg += '<polygon class="rd" points="' + vals.map(function (v, i) { return pt(i, v).map(function (x) { return x.toFixed(1); }).join(","); }).join(" ") + '"/>';
+    vals.forEach(function (v, i) { var p = pt(i, v); svg += '<circle class="rp" cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3"/>'; });
+    AXES.forEach(function (a, i) {
+      var ang = (-90 + i * 360 / n) * Math.PI / 180, lx = cx + (R + 14) * Math.cos(ang), ly = cy + (R + 14) * Math.sin(ang) + 3.5;
+      var c = Math.cos(ang), anchor = c > 0.3 ? "start" : (c < -0.3 ? "end" : "middle");
+      svg += '<text class="rl" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '">' + a[1].toUpperCase() +
+        ' <tspan class="rv">' + vals[i] + '</tspan></text>';
+    });
+    svg += "</svg>";
+    $("radar").innerHTML = svg;
+
+    var push = (tot.chest || 0) + (tot.delts || 0) + (tot.triceps || 0);
+    var pull = (tot.back || 0) + (tot.rear || 0) + (tot.biceps || 0);
+    var lower = (tot.quads || 0) + (tot.hams || 0), upper = push + pull;
+    function split(l1, v1, l2, v2, note) {
+      var p1 = Math.round(v1 / (v1 + v2) * 100);
+      return '<div class="split"><div class="sl"><span><i class="d1"></i>' + l1 + " <b>" + Math.round(v1) + '</b></span><span><b>' + Math.round(v2) + "</b> " + l2 +
+        '<i class="d2"></i></span></div><div class="sbar"><span style="width:' + p1 + '%"></span><span></span></div><p class="sn">' + p1 + "% / " + (100 - p1) + "%. " + note + "</p></div>";
+    }
+    var r = pull / push, pn;
+    if (r < 0.85) pn = "Push outweighs pull: pull is " + Math.round(r * 100) + "% of push volume.";
+    else if (r > 1.25) pn = "Pull outweighs push: push is " + Math.round(100 / r) + "% of pull volume.";
+    else pn = "Push and pull are balanced.";
+    var ls = lower / (lower + upper), un;
+    if (ls < 0.25) un = "Upper-body focused: the lower body gets " + Math.round(ls * 100) + "% of weekly sets.";
+    else if (ls <= 0.45) un = "Upper and lower body are reasonably balanced.";
+    else un = "Lower-body focused: the lower body gets " + Math.round(ls * 100) + "% of weekly sets.";
+    $("ratios").innerHTML = split("Push", push, "Pull", pull, pn) + split("Upper", upper, "Lower", lower, un);
+  }
+
+  function renderVolume() {
+    var tot = weeklyTotals();
     var MAX = 24;
     $("vol").innerHTML = MUSCLES.map(function (m) {
       var v = Math.round(tot[m[0]] || 0);
@@ -630,11 +839,13 @@
   $("reset-maxes").addEventListener("click", function () {
     applyPreset();
     syncMaxes();
+    renderStats();
     renderDay();
     updateEstimator();
   });
   $("fields").addEventListener("input", function () {
     syncMaxes();
+    renderStats();
     renderDay();
     updateEstimator();
   });
@@ -650,6 +861,8 @@
   renderStrip();
   renderDay(true);
   renderVolume();
+  renderBalance();
+  renderStats();
   updateEstimator();
 })();
 </script>
